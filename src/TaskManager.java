@@ -104,15 +104,18 @@ public class TaskManager {
     }
 
     public void updateTask(Task task) {
+        if (!tasks.containsKey(task.getId())) return;
         tasks.put(task.getId(), task);
     }
 
     public void updateEpic(Epic epic) {
+        if (!epics.containsKey(epic.getId())) return;
         controlEpicStatus(epic); // т.к. метод controlEpicStatus, ложит проверенный эпик в hashmap я решил, что
         // этого действия будет достаточно т.к он выполнит и проверку и обновление
     }
 
     public void updateSubTask(SubTask subTask) {
+        if (!subTasks.containsKey(subTask.getId())) return;
         subTasks.put(subTask.getId(), subTask);
         Epic epic = epics.get(subTask.getEpicId());
         HashMap<Integer, SubTask> updateSubTasks = epic.getSubTasks();
@@ -122,7 +125,7 @@ public class TaskManager {
 
     public void deleteTask(int id) {
         if (!tasks.containsKey(id)) {
-            System.out.println("Задачи с id" + id + " не существует");
+            System.out.println("Задачи с id " + id + " не существует");
             return;
         }
         taskId -= 1;
@@ -168,6 +171,7 @@ public class TaskManager {
     }
 
     public ArrayList<SubTask> getEpicSubTasks(int id) {
+        if (getEpic(id) == null) return null;
         Epic epic = getEpic(id);
         HashMap<Integer, SubTask> epicSubTasks = epic.getSubTasks();
 
