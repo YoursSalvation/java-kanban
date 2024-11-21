@@ -28,27 +28,13 @@ public class Task {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Task task = (Task) o;
-        return id == task.id &&
-                Objects.equals(title, task.title) &&
-                Objects.equals(description, task.description) &&
-                status == task.status;
+        return id == task.id;
     }
 
     @Override
     public int hashCode() {
         int hash = 17;
-        if (title != null) {
-            hash += hashCode();
-        }
         if (id != 0) {
-            hash += hashCode();
-        }
-        hash *= 31;
-
-        if (description != null) {
-            hash += hashCode();
-        }
-        if (status != null) {
             hash += hashCode();
         }
         return hash;
@@ -80,5 +66,9 @@ public class Task {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }
