@@ -8,28 +8,25 @@ public class TaskManager {
     private final HashMap<Integer, SubTask> subTasks;
 
     public TaskManager() {
-        taskId = 1;
+        taskId = 0;
         tasks = new HashMap<>();
         epics = new HashMap<>();
         subTasks = new HashMap<>();
     }
 
     public void createTask(Task task) {
-        idIncrement();
-        task.setId(taskId);
+        task.setId(idIncrement());
         tasks.put(task.getId(), task);
     }
 
     public void createEpic(Epic epic) {
-        idIncrement();
-        epic.setId(taskId);
+        epic.setId(idIncrement());
         epics.put(epic.getId(), epic);
     }
 
     public void createSubTask(SubTask subTask) {
-        idIncrement();
-        subTask.setId(taskId);
-        subTasks.put(taskId, subTask);
+        subTask.setId(idIncrement());
+        subTasks.put(subTask.getId(), subTask);
         Epic epic = epics.get(subTask.getEpicId());
         HashMap<Integer, SubTask> updateSubTasks = epic.getSubTasks();
         updateSubTasks.put(subTask.getId(), subTask);
@@ -143,8 +140,9 @@ public class TaskManager {
         return new ArrayList<>(epicSubTasks.values());
     }
 
-    private void idIncrement() {
+    private int idIncrement() {
         taskId += 1;
+        return taskId;
     }
 
     private void controlEpicStatus(Epic epic) {

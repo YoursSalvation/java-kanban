@@ -33,11 +33,7 @@ public class Task {
 
     @Override
     public int hashCode() {
-        int hash = 17;
-        if (id != 0) {
-            hash += hashCode();
-        }
-        return hash;
+        return Objects.hash(id);
     }
 
     public String getTitle() {
