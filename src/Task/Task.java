@@ -1,3 +1,5 @@
+package Task;
+
 import java.util.Objects;
 
 public class Task {
@@ -6,21 +8,21 @@ public class Task {
     private int id;
     private Status status;
 
-    Task(String title, String description, int id, Status status) {
+    public Task(String title, String description, int id, Status status) {
         this.title = title;
-        this.description = description;
         this.id = id;
+        this.description = description;
         this.status = status;
     }
 
     @Override
     public String toString() {
-        return "Task{" +
-                "title='" + title + '\'' +
-                ", description='" + description + '\'' +
-                ", id=" + id +
-                ", status=" + status +
-                '}';
+        return "\nTask {" +
+                "title = '" + title + '\'' +
+                ", description = '" + description + '\'' +
+                ", id = " + id +
+                ", status = " + status +
+                "}";
     }
 
     @Override
