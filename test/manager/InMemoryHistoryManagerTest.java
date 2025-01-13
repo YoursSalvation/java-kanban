@@ -1,6 +1,6 @@
-package Manager;
+package manager;
 
-import Task.*;
+import task.*;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

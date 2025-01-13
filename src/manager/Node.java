@@ -1,5 +1,5 @@
-package Manager;
-import Task.*;
+package manager;
+import task.*;
 
 public class Node {
     public final Task task;
