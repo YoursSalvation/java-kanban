@@ -21,7 +21,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public List<Task> getHistory() {
-        List<Task> tasks = new ArrayList<Task>();
+        List<Task> tasks = new ArrayList<>();
         Node node = head;
         while (node != null) {
             tasks.add(node.task);
