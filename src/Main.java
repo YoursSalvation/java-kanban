@@ -102,7 +102,7 @@ public class Main {
                             break;
                         case "SubTask":
                             System.out.println("Введите через 'Enter': название, описание, " +
-                                    "статус задачи и id Task.Epic задачи \n" +
+                                    "статус задачи и id Epic задачи \n" +
                                     "Возможные статусы задачи: NEW, IN_PROGRESS, DONE");
                             title = scanner.nextLine();
                             description = scanner.nextLine();
