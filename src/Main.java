@@ -1,5 +1,5 @@
-import Manager.*;
-import Task.*;
+import manager.*;
+import task.*;
 import java.util.Scanner;
 
 public class Main {
@@ -27,7 +27,7 @@ public class Main {
                             "Типы задач - Epic, Task, SubTask");
                     type = scanner.next();
                     switch (type) {
-                        case "Task":
+                        case "task":
                             System.out.println(inMemoryTaskManager.getTasks());
                             break;
                         case "Epic":
@@ -47,7 +47,7 @@ public class Main {
                             "Удаляя задачи типа 'Epic' вы так же удаляете все задачи типа 'SubTask'");
                     type = scanner.next();
                     switch (type) {
-                        case "Task":
+                        case "task":
                             inMemoryTaskManager.deleteAllTasks();
                             break;
                         case "Epic":
@@ -73,7 +73,7 @@ public class Main {
                     type = scanner.next();
                     scanner.nextLine();
                     switch (type) {
-                        case "Task":
+                        case "task":
                             System.out.println("Введите через 'Enter': название, описание и статус задачи \n" +
                                     "Возможные статусы задачи: NEW, IN_PROGRESS, DONE");
                             title = scanner.nextLine();
@@ -102,7 +102,7 @@ public class Main {
                             break;
                         case "SubTask":
                             System.out.println("Введите через 'Enter': название, описание, " +
-                                    "статус задачи и id Task.Epic задачи \n" +
+                                    "статус задачи и id Epic задачи \n" +
                                     "Возможные статусы задачи: NEW, IN_PROGRESS, DONE");
                             title = scanner.nextLine();
                             description = scanner.nextLine();
@@ -133,7 +133,7 @@ public class Main {
                     id = scanner.nextInt();
                     scanner.nextLine();
                     switch (type) {
-                        case "Task":
+                        case "task":
                             System.out.println("Введите через 'Enter': новые название, описание и статус задачи \n" +
                                     "Возможные статусы задачи: NEW, IN_PROGRESS, DONE");
                             title = scanner.nextLine();

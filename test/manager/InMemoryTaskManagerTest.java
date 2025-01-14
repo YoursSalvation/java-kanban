@@ -1,9 +1,9 @@
-package Manager;
+package manager;
 
-import Task.Epic;
-import Task.Status;
-import Task.SubTask;
-import Task.Task;
+import task.Epic;
+import task.Status;
+import task.SubTask;
+import task.Task;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -143,23 +143,10 @@ class InMemoryTaskManagerTest {
     }
 
     @Test
-    void GetHistory() {
-        inMemoryTaskManager.getTask(1);
-        inMemoryTaskManager.getTask(1);
-        inMemoryTaskManager.getTask(1);
-        inMemoryTaskManager.getTask(1);
-        inMemoryTaskManager.getTask(1);
-        inMemoryTaskManager.getTask(1);
-        inMemoryTaskManager.getTask(1);
-        inMemoryTaskManager.getTask(1);
-        inMemoryTaskManager.getTask(1);
-        assertEquals(9, inMemoryTaskManager.getHistory().size());
-        inMemoryTaskManager.getTask(1);
-        assertEquals(10, inMemoryTaskManager.getHistory().size());
-        inMemoryTaskManager.getTask(1);
-        inMemoryTaskManager.getTask(1);
-        inMemoryTaskManager.getTask(1);
-        inMemoryTaskManager.getTask(1);
-        assertEquals(10, inMemoryTaskManager.getHistory().size());
+    void CheckInvalidSubTaskInEpic() {
+        Epic epic = (Epic) inMemoryTaskManager.getTask(5);
+        assertEquals(3, epic.getSubTasks().size());
+        inMemoryTaskManager.deleteTask(9);
+        assertEquals(2, epic.getSubTasks().size());
     }
 }
