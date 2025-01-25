@@ -1,11 +1,25 @@
 import manager.*;
+import manager.exception.ManagerLoadException;
 import task.*;
+
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) {
-        TaskManager inMemoryTaskManager = Managers.getDefault();
+        TaskManager fileBackedTaskManager;
+        Path path = Paths.get("tasks.csv");
+        try {
+            fileBackedTaskManager = FileBackedTaskManager.loadFromFile(path.toFile());
+        } catch (ManagerLoadException e) {
+            System.out.println(e.getMessage());
+            fileBackedTaskManager = new FileBackedTaskManager(path);
+            System.out.println("Создан пустой менеджер");
+        }
         Scanner scanner = new Scanner(System.in);
         boolean isWorking = true;
 
@@ -19,22 +33,20 @@ public class Main {
             String tempStatus;
             Status status;
 
-            if (command < 0 || command > 8) return;
-
             switch (command) {
                 case 1:
                     System.out.println("Введите тип, задачи которого вы хотите получить \n" +
                             "Типы задач - Epic, Task, SubTask");
                     type = scanner.next();
                     switch (type) {
-                        case "task":
-                            System.out.println(inMemoryTaskManager.getTasks());
+                        case "Task":
+                            System.out.println(fileBackedTaskManager.getTasks());
                             break;
                         case "Epic":
-                            System.out.println(inMemoryTaskManager.getEpics());
+                            System.out.println(fileBackedTaskManager.getEpics());
                             break;
                         case "SubTask":
-                            System.out.println(inMemoryTaskManager.getSubTasks());
+                            System.out.println(fileBackedTaskManager.getSubTasks());
                             break;
                         case null, default:
                             System.out.println("Указан неверный тип задач");
@@ -47,14 +59,14 @@ public class Main {
                             "Удаляя задачи типа 'Epic' вы так же удаляете все задачи типа 'SubTask'");
                     type = scanner.next();
                     switch (type) {
-                        case "task":
-                            inMemoryTaskManager.deleteAllTasks();
+                        case "Task":
+                            fileBackedTaskManager.deleteAllTasks();
                             break;
                         case "Epic":
-                            inMemoryTaskManager.deleteAllEpics();
+                            fileBackedTaskManager.deleteAllEpics();
                             break;
                         case "SubTask":
-                            inMemoryTaskManager.deleteAllSubTasks();
+                            fileBackedTaskManager.deleteAllSubTasks();
                             break;
                         case null, default:
                             System.out.println("Указан неверный тип задач");
@@ -65,7 +77,7 @@ public class Main {
                     System.out.println("Введите id задачи, которую хотите получить");
                     id = scanner.nextInt();
                     scanner.nextLine();
-                    System.out.println(inMemoryTaskManager.getTask(id));
+                    System.out.println(fileBackedTaskManager.getTask(id));
                     break;
                 case 4:
                     System.out.println("Введите тип задачи, которую хотите создать \n" +
@@ -73,7 +85,7 @@ public class Main {
                     type = scanner.next();
                     scanner.nextLine();
                     switch (type) {
-                        case "task":
+                        case "Task":
                             System.out.println("Введите через 'Enter': название, описание и статус задачи \n" +
                                     "Возможные статусы задачи: NEW, IN_PROGRESS, DONE");
                             title = scanner.nextLine();
@@ -84,7 +96,7 @@ public class Main {
                                 System.out.println("Введен неверный статус задачи");
                             } else if (!title.isEmpty()) {
                                 status = Status.valueOf(tempStatus);
-                                inMemoryTaskManager.create(new Task(title, description, 0, status));
+                                fileBackedTaskManager.create(new Task(title, description, 0, status));
                             } else {
                                 System.out.println("Название не может быть пустым");
                             }
@@ -95,7 +107,7 @@ public class Main {
                             description = scanner.nextLine();
                             status = Status.NEW;
                             if (!title.isEmpty()) {
-                                inMemoryTaskManager.create(new Epic(new Task(title, description, 0, status)));
+                                fileBackedTaskManager.create(new Epic(new Task(title, description, 0, status)));
                             } else {
                                 System.out.println("Название не может быть пустым");
                             }
@@ -114,7 +126,7 @@ public class Main {
                             } else {
                                 status = Status.valueOf(tempStatus);
                                 if (!title.isEmpty()) {
-                                    inMemoryTaskManager.create(new SubTask(new Task(title, description,
+                                    fileBackedTaskManager.create(new SubTask(new Task(title, description,
                                             0, status), epicId));
                                 } else {
                                     System.out.println("Название не может быть пустым");
@@ -133,7 +145,7 @@ public class Main {
                     id = scanner.nextInt();
                     scanner.nextLine();
                     switch (type) {
-                        case "task":
+                        case "Task":
                             System.out.println("Введите через 'Enter': новые название, описание и статус задачи \n" +
                                     "Возможные статусы задачи: NEW, IN_PROGRESS, DONE");
                             title = scanner.nextLine();
@@ -144,7 +156,7 @@ public class Main {
                                 System.out.println("Введен неверный статус задачи");
                             } else if (!title.isEmpty()) {
                                 status = Status.valueOf(tempStatus);
-                                inMemoryTaskManager.update(new Task(title, description, id, status));
+                                fileBackedTaskManager.update(new Task(title, description, id, status));
                             } else {
                                 System.out.println("Название не может быть пустым");
                             }
@@ -154,7 +166,7 @@ public class Main {
                             title = scanner.nextLine();
                             description = scanner.nextLine();
                             if (!title.isEmpty()) {
-                                inMemoryTaskManager.update(new Epic(new Task(title, description, id,
+                                fileBackedTaskManager.update(new Epic(new Task(title, description, id,
                                         null)));
                             } else {
                                 System.out.println("Название не может быть пустым");
@@ -173,7 +185,7 @@ public class Main {
                             } else {
                                 status = Status.valueOf(tempStatus);
                                 if (!title.isEmpty()) {
-                                    inMemoryTaskManager.update(new SubTask(new Task(title, description, id,
+                                    fileBackedTaskManager.update(new SubTask(new Task(title, description, id,
                                             status), 0));
                                 } else {
                                     System.out.println("Название не может быть пустым");
@@ -189,23 +201,26 @@ public class Main {
                     System.out.println("Введите id задачи, которую необходимо удалить");
                     id = scanner.nextInt();
                     scanner.nextLine();
-                    inMemoryTaskManager.deleteTask(id);
+                    fileBackedTaskManager.deleteTask(id);
                     break;
                 case 7:
                     System.out.println("Введите id эпика подзадачи, которого хотите получить");
                     id = scanner.nextInt();
                     scanner.nextLine();
-                    if (inMemoryTaskManager.getEpicSubTasks(id) != null) {
-                        System.out.println(inMemoryTaskManager.getEpicSubTasks(id));
+                    if (fileBackedTaskManager.getEpicSubTasks(id) != null) {
+                        System.out.println(fileBackedTaskManager.getEpicSubTasks(id));
                     } else {
                         System.out.println("Такого эпика не существует");
                     }
                     break;
                 case 8:
-                    System.out.println(inMemoryTaskManager.getHistory());
+                    System.out.println(fileBackedTaskManager.getHistory());
                     break;
                 case 0:
                     isWorking = false;
+                    break;
+                default:
+                    System.out.println("Такой команды нет");
                     break;
             }
         }

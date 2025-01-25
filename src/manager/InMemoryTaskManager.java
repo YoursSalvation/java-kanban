@@ -1,6 +1,7 @@
 package manager;
 
 import task.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +15,12 @@ public class InMemoryTaskManager implements TaskManager {
         inMemoryHistoryManager = Managers.getDefaultHistory();
         taskId = 0;
         tasks = new HashMap<>();
+    }
+
+    public InMemoryTaskManager(HashMap<Integer, Task> tasks) {
+        inMemoryHistoryManager = Managers.getDefaultHistory();
+        this.tasks = tasks;
+        taskId = idIncrement();
     }
 
     @Override
@@ -200,9 +207,8 @@ public class InMemoryTaskManager implements TaskManager {
         return new ArrayList<>(epicSubTasks.values());
     }
 
-    private int idIncrement() {
-        taskId += 1;
-        return taskId;
+    protected HashMap<Integer, Task> getMap() {
+        return tasks;
     }
 
     private void controlEpicStatus(Epic epic) {
@@ -219,5 +225,10 @@ public class InMemoryTaskManager implements TaskManager {
         else if (doneCount == 0 && inProgressCount == 0) epic.setStatus(Status.NEW);
         else epic.setStatus(Status.IN_PROGRESS);
         tasks.put(epic.getId(), epic);
+    }
+
+    private int idIncrement() {
+        while (tasks.containsKey(taskId)) taskId++;
+        return taskId;
     }
 }
