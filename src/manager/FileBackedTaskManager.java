@@ -25,6 +25,30 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         this.path = path;
     }
 
+    public static FileBackedTaskManager loadFromFile(File file) throws ManagerLoadException {
+        HashMap<Integer, Task> tasks = new HashMap<>();
+        ArrayList<SubTask> subTasks = new ArrayList<>();
+        try (FileReader fr = new FileReader(file); BufferedReader br = new BufferedReader(fr)) {
+            String line = br.readLine(); // Для пропуска первой строки
+            while ((line = br.readLine()) != null) {
+                Task task = fromString(line);
+                if (task != null) {
+                    if (task instanceof SubTask subTask) {
+                        subTasks.add(subTask);
+                    } else if (task instanceof Epic epic) {
+                        tasks.put(epic.getId(), epic);
+                    } else {
+                        tasks.put(task.getId(), task);
+                    }
+                }
+            }
+            tasks = loadSubTasks(subTasks, tasks);
+            return new FileBackedTaskManager(file.toPath(), tasks);
+        } catch (IOException e) {
+            throw new ManagerLoadException("Ошибка при восстановлении данных из файла.");
+        }
+    }
+
     @Override
     public void create(Task task) {
         super.create(task);
@@ -125,7 +149,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
     }
 
-    public void save() throws ManagerSaveException {
+    private void save() throws ManagerSaveException {
         try (FileWriter fw = new FileWriter(path.toFile()); BufferedWriter bw = new BufferedWriter(fw)) {
             HashMap<Integer, Task> tasks = super.getMap();
             bw.write("id,type,title,status,description,epic");
@@ -138,30 +162,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         } catch (IOException e) {
             System.out.println(e.getMessage());
             throw new ManagerSaveException("Возникла ошибка при попытке сохранения файла.");
-        }
-    }
-
-    public static FileBackedTaskManager loadFromFile(File file) throws ManagerLoadException {
-        HashMap<Integer, Task> tasks = new HashMap<>();
-        ArrayList<SubTask> subTasks = new ArrayList<>();
-        try (FileReader fr = new FileReader(file); BufferedReader br = new BufferedReader(fr)) {
-            String line = br.readLine(); // Для пропуска первой строки
-            while ((line = br.readLine()) != null) {
-                Task task = fromString(line);
-                if (task != null) {
-                    if (task instanceof SubTask subTask) {
-                        subTasks.add(subTask);
-                    } else if (task instanceof Epic epic) {
-                        tasks.put(epic.getId(), epic);
-                    } else {
-                        tasks.put(task.getId(), task);
-                    }
-                }
-            }
-            tasks = loadSubTasks(subTasks, tasks);
-            return new FileBackedTaskManager(file.toPath(), tasks);
-        } catch (IOException e) {
-            throw new ManagerLoadException("Ошибка при восстановлении данных из файла.");
         }
     }
 
