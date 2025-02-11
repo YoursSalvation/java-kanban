@@ -110,8 +110,8 @@ public class Main {
                             } else if (!title.isEmpty()) {
                                 status = Status.valueOf(tempStatus);
                                 try {
-                                    fileBackedTaskManager.create(new Task(title, description, 0, status, duration
-                                            , startTime));
+                                    fileBackedTaskManager.create(new Task(title, description, 0, status, duration,
+                                            startTime));
                                 } catch (ManagerTaskCrossingException e) {
                                     System.out.println(e.getMessage());
                                 }
