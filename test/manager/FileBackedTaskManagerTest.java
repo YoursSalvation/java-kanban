@@ -1,6 +1,6 @@
 package manager;
 
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import task.Epic;
 import task.Status;
@@ -8,39 +8,35 @@ import task.SubTask;
 import task.Task;
 
 import java.io.*;
-import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-import static org.junit.jupiter.api.Assertions.*;
-class FileBackedTaskManagerTest {
-    static FileBackedTaskManager inMemoryTaskManager;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
+
+    protected FileBackedTaskManagerTest() throws IOException {
+        super(new FileBackedTaskManager(File.createTempFile("temp", ".csv").toPath()));
+    }
+
+    @BeforeEach
+    protected void work_space_to_default() {
+        super.work_space_to_default();
+    }
 
     @Test
-    void saveAndLoad() {
-        try {
-            inMemoryTaskManager = new FileBackedTaskManager(File.createTempFile("temp", ".csv").toPath());
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
-        inMemoryTaskManager.create(new Task("Task1", "Task1", 0, Status.NEW));
-        inMemoryTaskManager.create(new Task("Task2", "Task2", 1, Status.DONE));
-        inMemoryTaskManager.create(new Task("Task3", "Task3", 2, Status.IN_PROGRESS));
-        inMemoryTaskManager.create(new Epic(new Task("Epic1", "Epic1", 3, Status.DONE)));
-        inMemoryTaskManager.create(new Epic(new Task("Epic2", "Epic2", 4, Status.NEW)));
-        inMemoryTaskManager.create(new SubTask(new Task("SubTask1", "SubTask1", 5, Status.NEW), 3));
-        inMemoryTaskManager.create(new SubTask(new Task("SubTask2", "SubTask2", 6, Status.NEW), 3));
-        inMemoryTaskManager.create(new SubTask(new Task("SubTask3", "SubTask3", 7, Status.NEW), 4));
-        inMemoryTaskManager.create(new SubTask(new Task("SubTask4", "SubTask4", 8, Status.NEW), 4));
-        inMemoryTaskManager.create(new SubTask(new Task("SubTask5", "SubTask5", 9, Status.NEW), 4));
+    void save_and_load() {
+        HashMap<Integer, Task> excepted = new HashMap<>();
         try {
             File file = File.createTempFile("temp", ".csv");
             try (FileWriter fw = new FileWriter(file); BufferedWriter bw = new BufferedWriter(fw)) {
-                for (Task task : inMemoryTaskManager.getMap().values()) {
+                for (Task task : taskManager.getMap().values()) {
                     bw.write(toString(task));
-                    System.out.println(toString(task));
                     bw.newLine();
                 }
+                excepted = taskManager.getMap();
             } catch (IOException e) {
                 System.out.println(e.getMessage());
             }
@@ -62,7 +58,7 @@ class FileBackedTaskManagerTest {
                     }
                 }
                 tasks = loadSubTasks(subTasks, tasks);
-                System.out.println(tasks);
+                assertEquals(excepted, tasks);
             } catch (FileNotFoundException e) {
                 System.out.println("ошибка");
             } catch (IOException e) {
@@ -77,13 +73,14 @@ class FileBackedTaskManagerTest {
     private static String toString(Task task) {
         if (task instanceof SubTask subTask) {
             return task.getId() + "," + TypeTask.SUBTASK + "," + task.getTitle() + "," + task.getStatus() + ","
-                    + task.getDescription() + "," + subTask.getEpicId();
+                    + task.getDescription() + "," + task.getDuration().toMinutes() + "," + task.getStartTime() + ","
+                    + subTask.getEpicId();
         } else if (task instanceof Epic) {
             return task.getId() + "," + TypeTask.EPIC + "," + task.getTitle() + "," + task.getStatus() + ","
-                    + task.getDescription();
+                    + task.getDescription() + "," + task.getDuration().toMinutes() + "," + task.getStartTime();
         }
         return task.getId() + "," + TypeTask.TASK + "," + task.getTitle() + "," + task.getStatus() + ","
-                + task.getDescription();
+                + task.getDescription() + "," + task.getDuration().toMinutes() + "," + task.getStartTime();
     }
 
     private static Task fromString(String str) {
@@ -95,12 +92,14 @@ class FileBackedTaskManagerTest {
             int id = Integer.parseInt(info[0]);
             Status status = Status.valueOf(info[3]);
             TypeTask type = TypeTask.valueOf(info[1]);
+            Duration duration = Duration.ofMinutes(Long.parseLong(info[5]));
+            LocalDateTime startTime = LocalDateTime.parse(info[6]);
             if (type.equals(TypeTask.SUBTASK)) {
-                return new SubTask(new Task(title, description, id, status), Integer.parseInt(info[5]));
+                return new SubTask(new Task(title, description, id, status, duration, startTime), Integer.parseInt(info[7]));
             } else if (type.equals(TypeTask.EPIC)) {
                 return new Epic(new Task(title, description, id, status));
             }
-            return new Task(title, description, id, status);
+            return new Task(title, description, id, status, duration, startTime);
         } catch (Exception e) {
             System.out.println("Произошла ошибка во время преобразования строки в Task.");
             return null;

@@ -1,6 +1,6 @@
 package manager;
 
-import task.*;
+import task.Task;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -52,6 +52,13 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     public int getSize() {
         return size;
+    }
+
+    protected void clear() {
+        history.clear();
+        head = null;
+        tail = null;
+        size = 0;
     }
 
     private void linkLast(Task task) {

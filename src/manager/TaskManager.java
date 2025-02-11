@@ -1,18 +1,25 @@
 package manager;
 
-import task.*;
+import manager.exception.ManagerTaskCrossingException;
+import task.Epic;
+import task.SubTask;
+import task.Task;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
 public interface TaskManager {
 
     List<Task> getHistory();
 
-    void create(Task task);
+    TreeSet<Task> getPrioritizedTasks();
+
+    void create(Task task) throws ManagerTaskCrossingException;
 
     void create(Epic epic);
 
-    void create(SubTask subTask);
+    void create(SubTask subTask) throws ManagerTaskCrossingException;
 
     void deleteAllTasks();
 

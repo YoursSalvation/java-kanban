@@ -2,6 +2,7 @@ package manager;
 
 import manager.exception.ManagerLoadException;
 import manager.exception.ManagerSaveException;
+import manager.exception.ManagerTaskCrossingException;
 import task.Epic;
 import task.Status;
 import task.SubTask;
@@ -9,6 +10,8 @@ import task.Task;
 
 import java.io.*;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -50,7 +53,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void create(Task task) {
+    public void create(Task task) throws ManagerTaskCrossingException {
         super.create(task);
         try {
             save();
@@ -70,7 +73,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void create(SubTask subTask) {
+    public void create(SubTask subTask) throws ManagerTaskCrossingException {
         super.create(subTask);
         try {
             save();
@@ -152,13 +155,12 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     private void save() throws ManagerSaveException {
         try (FileWriter fw = new FileWriter(path.toFile()); BufferedWriter bw = new BufferedWriter(fw)) {
             HashMap<Integer, Task> tasks = super.getMap();
-            bw.write("id,type,title,status,description,epic");
+            bw.write("id,type,title,status,description,duration,startTime,epic");
             bw.newLine();
             for (Task task : tasks.values()) {
                 bw.write(toString(task));
                 bw.newLine();
             }
-
         } catch (IOException e) {
             System.out.println(e.getMessage());
             throw new ManagerSaveException("Возникла ошибка при попытке сохранения файла.");
@@ -180,13 +182,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     private static String toString(Task task) {
         if (task instanceof SubTask subTask) {
             return task.getId() + "," + TypeTask.SUBTASK + "," + task.getTitle() + "," + task.getStatus() + ","
-                    + task.getDescription() + "," + subTask.getEpicId();
+                    + task.getDescription() + "," + task.getDuration().toMinutes() + "," + task.getStartTime() + ","
+                    + subTask.getEpicId();
         } else if (task instanceof Epic) {
             return task.getId() + "," + TypeTask.EPIC + "," + task.getTitle() + "," + task.getStatus() + ","
-                    + task.getDescription();
+                    + task.getDescription() + "," + task.getDuration().toMinutes() + "," + task.getStartTime();
         }
         return task.getId() + "," + TypeTask.TASK + "," + task.getTitle() + "," + task.getStatus() + ","
-                + task.getDescription();
+                + task.getDescription() + "," + task.getDuration().toMinutes() + "," + task.getStartTime();
     }
 
     private static Task fromString(String str) {
@@ -198,12 +201,14 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             int id = Integer.parseInt(info[0]);
             Status status = Status.valueOf(info[3]);
             TypeTask type = TypeTask.valueOf(info[1]);
+            Duration duration = Duration.ofMinutes(Long.parseLong(info[5]));
+            LocalDateTime startTime = LocalDateTime.parse(info[6]);
             if (type.equals(TypeTask.SUBTASK)) {
-                return new SubTask(new Task(title, description, id, status), Integer.parseInt(info[5]));
+                return new SubTask(new Task(title, description, id, status, duration, startTime), Integer.parseInt(info[7]));
             } else if (type.equals(TypeTask.EPIC)) {
                 return new Epic(new Task(title, description, id, status));
             }
-            return new Task(title, description, id, status);
+            return new Task(title, description, id, status, duration, startTime);
         } catch (Exception e) {
             System.out.println("Произошла ошибка во время преобразования строки в Task.");
             return null;

@@ -1,5 +1,8 @@
 package task;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 
 public class Task {
@@ -7,12 +10,30 @@ public class Task {
     private String description;
     private int id;
     private Status status;
+    protected Duration duration;
+    protected LocalDateTime startTime;
+    protected static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy, HH:mm");
 
-    public Task(String title, String description, int id, Status status) {
+    public Task(String title, String description, int id, Status status, Duration duration, LocalDateTime startTime) {
         this.title = title;
         this.id = id;
         this.description = description;
         this.status = status;
+        this.duration = duration;
+        this.startTime = startTime;
+    }
+
+    public Task(String title, String description, int id, Status status) { // Конструктор для эпиков
+        this.title = title;
+        this.id = id;
+        this.description = description;
+        this.status = status;
+        this.duration = Duration.ofMinutes(0);
+        this.startTime = LocalDateTime.now();
+    }
+
+    public LocalDateTime getEndTime() {
+        return startTime.plus(duration);
     }
 
     @Override
@@ -22,6 +43,8 @@ public class Task {
                 ", description = '" + description + '\'' +
                 ", id = " + id +
                 ", status = " + status +
+                ", startTime = " + startTime.format(formatter) +
+                ", duration = " + duration.toMinutes() +
                 "}";
     }
 
@@ -46,6 +69,14 @@ public class Task {
         this.title = title;
     }
 
+    public void setDuration(Duration duration) {
+        this.duration = duration;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
     public String getDescription() {
         return description;
     }
@@ -60,6 +91,14 @@ public class Task {
 
     public Status getStatus() {
         return status;
+    }
+
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
     }
 
     public void setStatus(Status status) {
