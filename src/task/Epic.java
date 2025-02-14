@@ -1,6 +1,9 @@
 package task;
 
+import java.time.Duration;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Optional;
 
 public class Epic extends Task {
     private HashMap<Integer, SubTask> subTasks;
@@ -17,6 +20,8 @@ public class Epic extends Task {
                 ", description = '" + getDescription() + '\'' +
                 ", id = " + getId() +
                 ", status = " + getStatus() +
+                ", startTime = " + startTime.format(formatter) +
+                ", duration = " + duration.toMinutes() +
                 ", subTasksSize = " + subTasks.size() +
                 "}";
     }
@@ -27,5 +32,12 @@ public class Epic extends Task {
 
     public void setSubTasks(HashMap<Integer, SubTask> subTasks) {
         this.subTasks = subTasks;
+        duration = Duration.ofMinutes(0);
+
+        Optional<SubTask> minStartTime = this.subTasks.values().stream()
+                .peek(subTask -> duration = duration.plus(subTask.duration))
+                .min(Comparator.comparing(subTask -> subTask.startTime));
+
+        minStartTime.ifPresent(subTask -> startTime = subTask.startTime);
     }
 }

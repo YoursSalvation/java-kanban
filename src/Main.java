@@ -1,6 +1,7 @@
 import manager.FileBackedTaskManager;
 import manager.TaskManager;
 import manager.exception.ManagerLoadException;
+import manager.exception.ManagerTaskCrossingException;
 import task.Epic;
 import task.Status;
 import task.SubTask;
@@ -8,6 +9,9 @@ import task.Task;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Scanner;
 
 public class Main {
@@ -34,6 +38,9 @@ public class Main {
             String description;
             String tempStatus;
             Status status;
+            Duration duration;
+            LocalDateTime startTime;
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy, HH:mm");
 
             switch (command) {
                 case 1:
@@ -88,17 +95,26 @@ public class Main {
                     scanner.nextLine();
                     switch (type) {
                         case "Task":
-                            System.out.println("Введите через 'Enter': название, описание и статус задачи \n" +
+                            System.out.println("Введите через 'Enter': название, описание, статус" +
+                                    ", оценка времени на выполнение задачи в минутах, предполагаемую дату и" +
+                                    " время приступления к задаче в формате 'dd.MM.yyyy, HH:mm' \n" +
                                     "Возможные статусы задачи: NEW, IN_PROGRESS, DONE");
                             title = scanner.nextLine();
                             description = scanner.nextLine();
                             tempStatus = scanner.next();
+                            duration = Duration.ofMinutes(scanner.nextInt());
                             scanner.nextLine();
+                            startTime = LocalDateTime.parse(scanner.nextLine(), formatter);
                             if (!isValidStatus(tempStatus)) {
                                 System.out.println("Введен неверный статус задачи");
                             } else if (!title.isEmpty()) {
                                 status = Status.valueOf(tempStatus);
-                                fileBackedTaskManager.create(new Task(title, description, 0, status));
+                                try {
+                                    fileBackedTaskManager.create(new Task(title, description, 0, status, duration,
+                                            startTime));
+                                } catch (ManagerTaskCrossingException e) {
+                                    System.out.println(e.getMessage());
+                                }
                             } else {
                                 System.out.println("Название не может быть пустым");
                             }
@@ -115,21 +131,28 @@ public class Main {
                             }
                             break;
                         case "SubTask":
-                            System.out.println("Введите через 'Enter': название, описание, " +
-                                    "статус задачи и id Epic задачи \n" +
+                            System.out.println("Введите через 'Enter': название, описание, статус задачи, id Epic" +
+                                    " задачи, оценка времени на выполнение задачи в минутах, предполагаемую дату и " +
+                                    "время приступления к задаче в формате 'dd.MM.yyyy, HH:mm' \n" +
                                     "Возможные статусы задачи: NEW, IN_PROGRESS, DONE");
                             title = scanner.nextLine();
                             description = scanner.nextLine();
                             tempStatus = scanner.next();
                             int epicId = scanner.nextInt();
+                            duration = Duration.ofMinutes(scanner.nextInt());
                             scanner.nextLine();
+                            startTime = LocalDateTime.parse(scanner.nextLine(), formatter);
                             if (!isValidStatus(tempStatus)) {
                                 System.out.println("Введен неверный статус задачи");
                             } else {
                                 status = Status.valueOf(tempStatus);
                                 if (!title.isEmpty()) {
-                                    fileBackedTaskManager.create(new SubTask(new Task(title, description,
-                                            0, status), epicId));
+                                    try {
+                                        fileBackedTaskManager.create(new SubTask(new Task(title, description,
+                                                0, status, duration, startTime), epicId));
+                                    } catch (ManagerTaskCrossingException e) {
+                                        System.out.println(e.getMessage());
+                                    }
                                 } else {
                                     System.out.println("Название не может быть пустым");
                                 }
@@ -218,6 +241,9 @@ public class Main {
                 case 8:
                     System.out.println(fileBackedTaskManager.getHistory());
                     break;
+                case 9:
+                    System.out.println(fileBackedTaskManager.getPrioritizedTasks());
+                    break;
                 case 0:
                     isWorking = false;
                     break;
@@ -238,6 +264,7 @@ public class Main {
         System.out.println("6. Удалить задачу по идентификатору");
         System.out.println("7. Получить список всех подзадач эпика");
         System.out.println("8. Посмотреть историю просмотров");
+        System.out.println("9. Посмотреть список задач по приоритету");
         System.out.println("0. Выход");
     }
 

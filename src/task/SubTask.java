@@ -4,7 +4,8 @@ public class SubTask extends Task {
     private int epicId;
 
     public SubTask(Task task, int epicId) {
-        super(task.getTitle(), task.getDescription(), task.getId(), task.getStatus());
+        super(task.getTitle(), task.getDescription(), task.getId(), task.getStatus(), task.getDuration(),
+                task.getStartTime());
         this.epicId = epicId;
     }
 
@@ -26,6 +27,8 @@ public class SubTask extends Task {
                 ", description = '" + getDescription() + '\'' +
                 ", id = " + getId() +
                 ", status = " + getStatus() +
+                ", startTime = " + startTime.format(formatter) +
+                ", duration = " + duration.toMinutes() +
                 "}";
     }
 }
