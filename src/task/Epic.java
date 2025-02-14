@@ -1,5 +1,6 @@
 package task;
 
+import java.time.Duration;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Optional;
@@ -31,6 +32,7 @@ public class Epic extends Task {
 
     public void setSubTasks(HashMap<Integer, SubTask> subTasks) {
         this.subTasks = subTasks;
+        duration = Duration.ofMinutes(0);
 
         Optional<SubTask> minStartTime = this.subTasks.values().stream()
                 .peek(subTask -> duration = duration.plus(subTask.duration))
