@@ -8,9 +8,8 @@ class ManagersTest {
 
     @Test
     void get_default() {
-        InMemoryTaskManager excepted = new InMemoryTaskManager();
         TaskManager actual = Managers.getDefault();
-        assertEquals(excepted.getClass(), actual.getClass());
+        assertEquals(FileBackedTaskManager.class, actual.getClass());
     }
 
     @Test

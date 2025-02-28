@@ -1,6 +1,7 @@
 package manager;
 
 import manager.exception.ManagerTaskCrossingException;
+import manager.exception.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import task.Epic;
@@ -28,7 +29,7 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
     }
 
     @Test
-    void check_epic_status_correct_work() {
+    void check_epic_status_correct_work() throws NotFoundException {
         taskManager.create(new Epic(new Task("Epic3", "Epic3", 10, Status.DONE)));
         assertEquals(Status.NEW, taskManager.getTask(10).getStatus());
         try {

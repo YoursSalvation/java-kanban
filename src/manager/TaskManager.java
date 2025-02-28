@@ -1,19 +1,19 @@
 package manager;
 
 import manager.exception.ManagerTaskCrossingException;
+import manager.exception.NotFoundException;
 import task.Epic;
 import task.SubTask;
 import task.Task;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeSet;
+import java.util.Set;
 
 public interface TaskManager {
 
     List<Task> getHistory();
 
-    TreeSet<Task> getPrioritizedTasks();
+    Set<Task> getPrioritizedTasks();
 
     void create(Task task) throws ManagerTaskCrossingException;
 
@@ -27,21 +27,21 @@ public interface TaskManager {
 
     void deleteAllSubTasks();
 
-    ArrayList<Task> getTasks();
+    List<Task> getTasks();
 
-    ArrayList<Epic> getEpics();
+    List<Epic> getEpics();
 
-    ArrayList<SubTask> getSubTasks();
+    List<SubTask> getSubTasks();
 
-    Task getTask(int id);
+    Task getTask(int id) throws NotFoundException;
 
-    void update(Task task);
+    void update(Task task) throws NotFoundException;
 
-    void update(Epic epic);
+    void update(Epic epic) throws NotFoundException;
 
-    void update(SubTask subTask);
+    void update(SubTask subTask) throws NotFoundException;
 
-    void deleteTask(int id);
+    void deleteTask(int id) throws NotFoundException;
 
-    ArrayList<SubTask> getEpicSubTasks(int id);
+    List<SubTask> getEpicSubTasks(int id) throws NotFoundException;
 }
