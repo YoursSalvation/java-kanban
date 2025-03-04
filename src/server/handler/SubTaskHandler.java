@@ -25,7 +25,7 @@ public class SubTaskHandler extends BaseHttpHandler implements HttpHandler {
             } else {
                 try {
                     int id = Integer.parseInt(path[2]);
-                    getSubTaskId(exchange, id);
+                    getSubTaskById(exchange, id);
                 } catch (NumberFormatException e) {
                     send(exchange, 400, "Неверный формат id задачи");
                 }
@@ -63,7 +63,7 @@ public class SubTaskHandler extends BaseHttpHandler implements HttpHandler {
         sendJson(exchange, json);
     }
 
-    private void getSubTaskId(HttpExchange exchange, int id) throws IOException {
+    private void getSubTaskById(HttpExchange exchange, int id) throws IOException {
         try {
             SubTask subTask = (SubTask) Managers.getDefault().getTask(id);
             String json = HttpTaskServer.getGson().toJson(subTask);

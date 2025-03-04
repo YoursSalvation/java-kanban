@@ -23,12 +23,12 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
     }
 
     @BeforeEach
-    protected void work_space_to_default() {
-        super.work_space_to_default();
+    protected void WorkSpaceToDefault() {
+        super.workSpaceToDefault();
     }
 
     @Test
-    void save_and_load() {
+    void SaveAndLoad() {
         Map<Integer, Task> excepted = new HashMap<>();
         try {
             File file = File.createTempFile("temp", ".csv");

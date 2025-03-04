@@ -26,7 +26,7 @@ public class EpicHandler extends BaseHttpHandler implements HttpHandler {
                 try {
                     int id = Integer.parseInt(path[2]);
                     if (path.length < 4) {
-                        getEpicId(exchange, id);
+                        getEpicById(exchange, id);
                     } else if (path[3].equals("subtasks")) {
                         getEpicSubTasks(exchange, id);
                     }
@@ -68,7 +68,7 @@ public class EpicHandler extends BaseHttpHandler implements HttpHandler {
         }
     }
 
-    private void getEpicId(HttpExchange exchange, int id) throws IOException {
+    private void getEpicById(HttpExchange exchange, int id) throws IOException {
         try {
             Epic epic = (Epic) Managers.getDefault().getTask(id);
             String json = HttpTaskServer.getGson().toJson(epic);
@@ -97,14 +97,4 @@ public class EpicHandler extends BaseHttpHandler implements HttpHandler {
             sendNotFound(exchange, e.getMessage());
         }
     }
-
-//    private void updateEpic(HttpExchange exchange, String body, int id) throws IOException {
-//        try {
-//            Epic epic = new Gson().fromJson(body, Epic.class);
-//            Managers.getDefault().update(epic);
-//            send(exchange, 201, "Эпик обновлен");
-//        } catch (NotFoundException e) {
-//            sendNotFound(exchange, e.getMessage());
-//        }
-//    }
 }

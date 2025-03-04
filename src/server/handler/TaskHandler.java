@@ -27,7 +27,7 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
             } else {
                 try {
                     int id = Integer.parseInt(path[2]);
-                    getTaskId(exchange, id);
+                    getTaskById(exchange, id);
                 } catch (NumberFormatException e) {
                     send(exchange, 400, "Неверный формат id задачи");
                 }
@@ -65,7 +65,7 @@ public class TaskHandler extends BaseHttpHandler implements HttpHandler {
         sendJson(exchange, json);
     }
 
-    private void getTaskId(HttpExchange exchange, int id) throws IOException {
+    private void getTaskById(HttpExchange exchange, int id) throws IOException {
         try {
             Task task = Managers.getDefault().getTask(id);
             String json = HttpTaskServer.getGson().toJson(task);

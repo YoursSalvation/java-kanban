@@ -11,12 +11,12 @@ class InMemoryHistoryManagerTest {
     static InMemoryHistoryManager inMemoryHistoryManager = new InMemoryHistoryManager();
 
     @BeforeEach
-    void to_default() {
+    void toDefault() {
         inMemoryHistoryManager.clear();
     }
 
     @Test
-    void add_and_get_history() {
+    void addAndGetHistory() {
         Task excepted = new Task("1", "1", 1, Status.NEW);
         inMemoryHistoryManager.add(new Task("1", "1", 1, Status.NEW));
         assertEquals(1, inMemoryHistoryManager.getHistory().size());
@@ -31,7 +31,7 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void remove_node() {
+    void removeNode() {
         inMemoryHistoryManager.add(new Task("1", "1", 1, Status.NEW));
         inMemoryHistoryManager.add(new Task("1", "1", 2, Status.NEW));
         inMemoryHistoryManager.add(new Task("1", "1", 3, Status.NEW));
@@ -43,7 +43,7 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void empty_history() {
+    void emptyHistory() {
         assertEquals(0, inMemoryHistoryManager.getSize());
     }
 
@@ -58,7 +58,7 @@ class InMemoryHistoryManagerTest {
     }
 
     @Test
-    void remove_first_mid_last() {
+    void removeFirstMidLast() {
         inMemoryHistoryManager.add(new Task("1", "1", 0, Status.NEW));
         inMemoryHistoryManager.add(new Task("2", "2", 1, Status.NEW));
         inMemoryHistoryManager.add(new Task("3", "3", 2, Status.NEW));

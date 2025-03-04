@@ -35,7 +35,7 @@ class HttpTaskServerTest {
     Gson gson = HttpTaskServer.getGson();
 
     @BeforeEach
-    protected void work_space_to_default() {
+    protected void workSpaceToDefault() {
         taskManager.deleteAllSubTasks();
         taskManager.deleteAllTasks();
         taskManager.deleteAllEpics();
@@ -63,7 +63,7 @@ class HttpTaskServerTest {
 
     @Test
     @Order(1)
-    protected void get_methods() throws IOException, InterruptedException, NotFoundException {
+    protected void getMethods() throws IOException, InterruptedException, NotFoundException {
         HttpClient client = HttpClient.newHttpClient();
         HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8);
         HttpRequest.Builder requsetBuilder = HttpRequest.newBuilder();
@@ -143,7 +143,7 @@ class HttpTaskServerTest {
 
     @Test
     @Order(2)
-    protected void post_methods() throws IOException, InterruptedException {
+    protected void postMethods() throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8);
         HttpRequest.Builder requsetBuilder = HttpRequest.newBuilder();
@@ -202,7 +202,7 @@ class HttpTaskServerTest {
 
     @Test
     @Order(3)
-    protected void delete_methods() throws IOException, InterruptedException {
+    protected void deleteMethods() throws IOException, InterruptedException {
         HttpClient client = HttpClient.newHttpClient();
         HttpResponse.BodyHandler<String> handler = HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8);
         HttpRequest.Builder requsetBuilder = HttpRequest.newBuilder();
@@ -232,7 +232,7 @@ class HttpTaskServerTest {
     }
 
     @AfterEach
-    protected void server_stop() {
+    protected void terminate() {
         httpTaskServer.stop();
     }
 }
