@@ -7,14 +7,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class ManagersTest {
 
     @Test
-    void get_default() {
-        InMemoryTaskManager excepted = new InMemoryTaskManager();
+    void getDefault() {
         TaskManager actual = Managers.getDefault();
-        assertEquals(excepted.getClass(), actual.getClass());
+        assertEquals(FileBackedTaskManager.class, actual.getClass());
     }
 
     @Test
-    void get_default_history() {
+    void getDefaultHistory() {
         InMemoryHistoryManager excepted = new InMemoryHistoryManager();
         HistoryManager actual = Managers.getDefaultHistory();
         assertEquals(actual.getClass(), excepted.getClass());

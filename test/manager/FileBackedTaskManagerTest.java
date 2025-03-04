@@ -12,6 +12,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -22,13 +23,13 @@ class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
     }
 
     @BeforeEach
-    protected void work_space_to_default() {
-        super.work_space_to_default();
+    protected void workSpaceToDefault() {
+        super.workSpaceToDefault();
     }
 
     @Test
-    void save_and_load() {
-        HashMap<Integer, Task> excepted = new HashMap<>();
+    void saveAndLoad() {
+        Map<Integer, Task> excepted = new HashMap<>();
         try {
             File file = File.createTempFile("temp", ".csv");
             try (FileWriter fw = new FileWriter(file); BufferedWriter bw = new BufferedWriter(fw)) {

@@ -1,6 +1,7 @@
 package manager;
 
 import manager.exception.ManagerTaskCrossingException;
+import manager.exception.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import task.Epic;
@@ -14,7 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 abstract class TaskManagerTest<T extends TaskManager> {
     protected static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy, HH:mm");
@@ -25,7 +26,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @BeforeEach
-    protected void work_space_to_default() {
+    protected void workSpaceToDefault() {
         taskManager.deleteAllSubTasks();
         taskManager.deleteAllTasks();
         taskManager.deleteAllEpics();
@@ -54,14 +55,14 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void delete_all_tasks() {
+    void deleteAllTasks() {
         taskManager.deleteAllTasks();
         ArrayList<Task> excepted = new ArrayList<>();
         assertEquals(excepted, taskManager.getTasks());
     }
 
     @Test
-    void delete_all_epics() {
+    void deleteAllEpics() {
         taskManager.deleteAllEpics();
         ArrayList<Epic> exceptedEpics = new ArrayList<>();
         ArrayList<SubTask> exceptedSubTasks = new ArrayList<>();
@@ -70,14 +71,14 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void delete_all_subTasks() {
+    void deleteAllSubTasks() {
         taskManager.deleteAllSubTasks();
         ArrayList<SubTask> excepted = new ArrayList<>();
         assertEquals(excepted, taskManager.getSubTasks());
     }
 
     @Test
-    void get_all_tasks() {
+    void getAllTasks() {
         ArrayList<Task> excepted = new ArrayList<>();
         Task task = new Task("Task1", "Task1", 0, Status.NEW, Duration.ofMinutes(120)
                 , LocalDateTime.parse("06.03.2025, 10:00", formatter));
@@ -92,7 +93,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void get_all_epics() {
+    void getAllEpics() {
         ArrayList<Epic> excepted = new ArrayList<>();
         Epic epic = new Epic(new Task("Epic1", "Epic1", 3, Status.NEW));
         excepted.add(epic);
@@ -102,7 +103,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void get_all_subTasks() {
+    void getAllSubTasks() {
         ArrayList<SubTask> excepted = new ArrayList<>();
         SubTask subTask = new SubTask(new Task("SubTask1", "SubTask1", 5, Status.NEW
                 , Duration.ofMinutes(45), LocalDateTime.parse("09.03.2025, 12:00", formatter)), 3);
@@ -123,14 +124,14 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void get_task() {
+    void getTask() throws NotFoundException {
         SubTask subTask = new SubTask(new Task("SubTask1", "SubTask1", 5, Status.NEW
                 , Duration.ofMinutes(45), LocalDateTime.parse("09.03.2025, 12:00", formatter)), 3);
         assertEquals(subTask, taskManager.getTask(5));
     }
 
     @Test
-    void update() {
+    void update() throws NotFoundException {
         Task excepted = new Task("777", "777", 0, Status.NEW, Duration.ofMinutes(120)
                 , LocalDateTime.parse("11.11.1111, 11:11", formatter));
         taskManager.update(excepted);
@@ -143,13 +144,13 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void delete_task() {
+    void deleteTask() throws NotFoundException {
         taskManager.deleteTask(1);
-        assertNull(taskManager.getTask(1));
+        assertThrows(NotFoundException.class, () -> taskManager.getTask(1));
     }
 
     @Test
-    void get_epic_subTasks() {
+    void getEpicSubTasks() throws NotFoundException {
         ArrayList<SubTask> excepted = new ArrayList<>();
         excepted.add(new SubTask(new Task("SubTask1", "SubTask1", 5, Status.NEW
                 , Duration.ofMinutes(45), LocalDateTime.parse("09.03.2025, 12:00", formatter)), 3));
@@ -159,7 +160,7 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void check_invalid_subTask_in_epic() {
+    void checkInvalidSubTaskInEpic() throws NotFoundException {
         Epic epic = (Epic) taskManager.getTask(4);
         assertEquals(3, epic.getSubTasks().size());
         taskManager.deleteTask(8);
@@ -167,13 +168,13 @@ abstract class TaskManagerTest<T extends TaskManager> {
     }
 
     @Test
-    void should_not_create_subTask_without_epic() {
+    void shouldNotCreateSubTaskWithoutEpic() throws NotFoundException {
         try {
             taskManager.create(new SubTask(new Task("SubTask1", "SubTask1", 10, Status.NEW
                     , Duration.ofMinutes(45), LocalDateTime.parse("09.03.2025, 12:00", formatter)), 20));
         } catch (ManagerTaskCrossingException e) {
             System.out.println(e.getMessage());
         }
-        assertNull(taskManager.getTask(10));
+        assertThrows(NotFoundException.class, () -> taskManager.getTask(10));
     }
 }

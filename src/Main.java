@@ -2,6 +2,7 @@ import manager.FileBackedTaskManager;
 import manager.TaskManager;
 import manager.exception.ManagerLoadException;
 import manager.exception.ManagerTaskCrossingException;
+import manager.exception.NotFoundException;
 import task.Epic;
 import task.Status;
 import task.SubTask;
@@ -86,7 +87,11 @@ public class Main {
                     System.out.println("Введите id задачи, которую хотите получить");
                     id = scanner.nextInt();
                     scanner.nextLine();
-                    System.out.println(fileBackedTaskManager.getTask(id));
+                    try {
+                        System.out.println(fileBackedTaskManager.getTask(id));
+                    } catch (NotFoundException e) {
+                        System.out.println(e.getMessage());
+                    }
                     break;
                 case 4:
                     System.out.println("Введите тип задачи, которую хотите создать \n" +
@@ -181,7 +186,11 @@ public class Main {
                                 System.out.println("Введен неверный статус задачи");
                             } else if (!title.isEmpty()) {
                                 status = Status.valueOf(tempStatus);
-                                fileBackedTaskManager.update(new Task(title, description, id, status));
+                                try {
+                                    fileBackedTaskManager.update(new Task(title, description, id, status));
+                                } catch (NotFoundException e) {
+                                    System.out.println(e.getMessage());
+                                }
                             } else {
                                 System.out.println("Название не может быть пустым");
                             }
@@ -191,8 +200,12 @@ public class Main {
                             title = scanner.nextLine();
                             description = scanner.nextLine();
                             if (!title.isEmpty()) {
-                                fileBackedTaskManager.update(new Epic(new Task(title, description, id,
-                                        null)));
+                                try {
+                                    fileBackedTaskManager.update(new Epic(new Task(title, description, id,
+                                            null)));
+                                } catch (NotFoundException e) {
+                                    System.out.println(e.getMessage());
+                                }
                             } else {
                                 System.out.println("Название не может быть пустым");
                             }
@@ -210,8 +223,12 @@ public class Main {
                             } else {
                                 status = Status.valueOf(tempStatus);
                                 if (!title.isEmpty()) {
-                                    fileBackedTaskManager.update(new SubTask(new Task(title, description, id,
-                                            status), 0));
+                                    try {
+                                        fileBackedTaskManager.update(new SubTask(new Task(title, description, id,
+                                                status), 0));
+                                    } catch (NotFoundException e) {
+                                        System.out.println(e.getMessage());
+                                    }
                                 } else {
                                     System.out.println("Название не может быть пустым");
                                 }
@@ -226,16 +243,20 @@ public class Main {
                     System.out.println("Введите id задачи, которую необходимо удалить");
                     id = scanner.nextInt();
                     scanner.nextLine();
-                    fileBackedTaskManager.deleteTask(id);
+                    try {
+                        fileBackedTaskManager.deleteTask(id);
+                    } catch (NotFoundException e) {
+                        System.out.println(e.getMessage());
+                    }
                     break;
                 case 7:
                     System.out.println("Введите id эпика подзадачи, которого хотите получить");
                     id = scanner.nextInt();
                     scanner.nextLine();
-                    if (fileBackedTaskManager.getEpicSubTasks(id) != null) {
+                    try {
                         System.out.println(fileBackedTaskManager.getEpicSubTasks(id));
-                    } else {
-                        System.out.println("Такого эпика не существует");
+                    } catch (NotFoundException e) {
+                        System.out.println(e.getMessage());
                     }
                     break;
                 case 8:

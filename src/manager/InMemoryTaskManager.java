@@ -1,6 +1,7 @@
 package manager;
 
 import manager.exception.ManagerTaskCrossingException;
+import manager.exception.NotFoundException;
 import task.Epic;
 import task.Status;
 import task.SubTask;
@@ -11,9 +12,9 @@ import java.util.stream.Collectors;
 
 public class InMemoryTaskManager implements TaskManager {
     protected int taskId;
-    private final HashMap<Integer, Task> tasks;
+    private final Map<Integer, Task> tasks;
     private final HistoryManager inMemoryHistoryManager;
-    private final TreeSet<Task> prioritizedTasks = new TreeSet<>(Comparator.comparing(Task::getStartTime));
+    private final Set<Task> prioritizedTasks = new TreeSet<>(Comparator.comparing(Task::getStartTime));
 
     public InMemoryTaskManager() {
         inMemoryHistoryManager = Managers.getDefaultHistory();
@@ -24,12 +25,14 @@ public class InMemoryTaskManager implements TaskManager {
     public InMemoryTaskManager(HashMap<Integer, Task> tasks) {
         inMemoryHistoryManager = Managers.getDefaultHistory();
         this.tasks = tasks;
-        prioritizedTasks.addAll(tasks.values());
+        tasks.values().stream()
+                .filter(task -> !(task instanceof Epic))
+                .forEach(prioritizedTasks::add);
         taskId = idIncrement();
     }
 
     @Override
-    public TreeSet<Task> getPrioritizedTasks() {
+    public Set<Task> getPrioritizedTasks() {
         return prioritizedTasks;
     }
 
@@ -114,39 +117,39 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<Task> getTasks() {
+    public List<Task> getTasks() {
         return tasks.values().stream()
                 .filter(task -> !(task instanceof Epic) && !(task instanceof SubTask))
-                .collect(Collectors.toCollection(ArrayList::new));
+                .toList();
     }
 
     @Override
-    public ArrayList<Epic> getEpics() {
+    public List<Epic> getEpics() {
         return tasks.values().stream()
                 .filter(task -> task instanceof Epic)
                 .map(task -> (Epic) task)
-                .collect(Collectors.toCollection(ArrayList::new));
+                .toList();
     }
 
     @Override
-    public ArrayList<SubTask> getSubTasks() {
+    public List<SubTask> getSubTasks() {
         return tasks.values().stream()
                 .filter(task -> task instanceof SubTask)
                 .map(task -> (SubTask) task)
-                .collect(Collectors.toCollection(ArrayList::new));
+                .toList();
     }
 
     @Override
-    public Task getTask(int id) {
-        if (!tasks.containsKey(id)) return null;
+    public Task getTask(int id) throws NotFoundException {
+        if (!tasks.containsKey(id)) throw new NotFoundException("Задача с таким id не найдена");
         inMemoryHistoryManager.add(tasks.get(id));
         return tasks.get(id);
     }
 
     @Override
-    public void update(Task task) {
-        if (!tasks.containsKey(task.getId())) return;
-        if (tasks.get(task.getId()) instanceof Epic || tasks.get(task.getId()) instanceof SubTask) return;
+    public void update(Task task) throws NotFoundException {
+        if (!tasks.containsKey(task.getId()) || tasks.get(task.getId()) instanceof Epic || tasks.get(task.getId())
+                instanceof SubTask) throw new NotFoundException("Задача с таким id не найдена");
         Task oldTask = tasks.get(task.getId());
         task.setDuration(oldTask.getDuration());
         task.setStartTime(oldTask.getStartTime());
@@ -156,17 +159,17 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void update(Epic epic) {
-        if (!tasks.containsKey(epic.getId())) return;
-        if (!(tasks.get(epic.getId()) instanceof Epic oldEpic)) return;
+    public void update(Epic epic) throws NotFoundException {
+        if (!tasks.containsKey(epic.getId()) || !(tasks.get(epic.getId()) instanceof Epic oldEpic))
+            throw new NotFoundException("Задача с таким id не найдена");
         epic.setSubTasks(oldEpic.getSubTasks());
         controlEpicStatus(epic);
     }
 
     @Override
-    public void update(SubTask subTask) {
-        if (!tasks.containsKey(subTask.getId())) return;
-        if (!(tasks.get(subTask.getId()) instanceof SubTask oldSubTask)) return;
+    public void update(SubTask subTask) throws NotFoundException {
+        if (!tasks.containsKey(subTask.getId()) || !(tasks.get(subTask.getId()) instanceof SubTask oldSubTask))
+            throw new NotFoundException("Задача с таким id не найдена");
         int epicId = oldSubTask.getEpicId();
         subTask.setEpicId(epicId);
         subTask.setDuration(oldSubTask.getDuration());
@@ -182,8 +185,8 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public void deleteTask(int id) {
-        if (!tasks.containsKey(id)) return;
+    public void deleteTask(int id) throws NotFoundException {
+        if (!tasks.containsKey(id)) throw new NotFoundException("Задача с таким id не найдена");
         if (tasks.get(id) instanceof Epic epic) {
             HashMap<Integer, SubTask> subTasksToDel = epic.getSubTasks();
             for (Integer idSubTask : subTasksToDel.keySet()) {
@@ -204,13 +207,13 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<SubTask> getEpicSubTasks(int id) {
-        if (!(tasks.get(id) instanceof Epic epic)) return null;
+    public List<SubTask> getEpicSubTasks(int id) throws NotFoundException {
+        if (!(tasks.get(id) instanceof Epic epic)) throw new NotFoundException("Задача с таким id не найдена");
         HashMap<Integer, SubTask> epicSubTasks = epic.getSubTasks();
         return new ArrayList<>(epicSubTasks.values());
     }
 
-    protected HashMap<Integer, Task> getMap() {
+    protected Map<Integer, Task> getMap() {
         return tasks;
     }
 

@@ -3,6 +3,7 @@ package manager;
 import manager.exception.ManagerLoadException;
 import manager.exception.ManagerSaveException;
 import manager.exception.ManagerTaskCrossingException;
+import manager.exception.NotFoundException;
 import task.Epic;
 import task.Status;
 import task.SubTask;
@@ -14,6 +15,7 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
     private final Path path;
@@ -113,7 +115,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void update(Task task) {
+    public void update(Task task) throws NotFoundException {
         super.update(task);
         try {
             save();
@@ -123,7 +125,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void update(Epic epic) {
+    public void update(Epic epic) throws NotFoundException {
         super.update(epic);
         try {
             save();
@@ -133,7 +135,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void update(SubTask subTask) {
+    public void update(SubTask subTask) throws NotFoundException {
         super.update(subTask);
         try {
             save();
@@ -143,7 +145,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public void deleteTask(int id) {
+    public void deleteTask(int id) throws NotFoundException {
         super.deleteTask(id);
         try {
             save();
@@ -154,7 +156,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     private void save() throws ManagerSaveException {
         try (FileWriter fw = new FileWriter(path.toFile()); BufferedWriter bw = new BufferedWriter(fw)) {
-            HashMap<Integer, Task> tasks = super.getMap();
+            Map<Integer, Task> tasks = super.getMap();
             bw.write("id,type,title,status,description,duration,startTime,epic");
             bw.newLine();
             for (Task task : tasks.values()) {

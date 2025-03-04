@@ -1,6 +1,7 @@
 package manager;
 
 import manager.exception.ManagerTaskCrossingException;
+import manager.exception.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import task.Epic;
@@ -23,12 +24,12 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
     }
 
     @BeforeEach
-    protected void work_space_to_default() {
-        super.work_space_to_default();
+    protected void workSpaceToDefault() {
+        super.workSpaceToDefault();
     }
 
     @Test
-    void check_epic_status_correct_work() {
+    void checkEpicStatusCorrectWork() throws NotFoundException {
         taskManager.create(new Epic(new Task("Epic3", "Epic3", 10, Status.DONE)));
         assertEquals(Status.NEW, taskManager.getTask(10).getStatus());
         try {
@@ -52,7 +53,7 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
     }
 
     @Test
-    void check_prioritized_tasks_treeSet() {
+    void checkPrioritizedTaskTreeSet() {
         TreeSet<Task> excepted = new TreeSet<>(Comparator.comparing(Task::getStartTime));
         excepted.add(new Task("Task1", "Task1", 0, Status.NEW, Duration.ofMinutes(10)
                 , LocalDateTime.parse("06.03.2025, 10:00", formatter)));
@@ -74,7 +75,7 @@ class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager> {
     }
 
     @Test
-    void check_isCrossing_correct_work() {
+    void checkIsCrossingCorrectWork() {
         assertThrows(ManagerTaskCrossingException.class, () -> {
             taskManager.create(new Task("Task1", "Task1", 0, Status.NEW, Duration.ofMinutes(10)
                     , LocalDateTime.parse("06.03.2025, 10:00", formatter)));

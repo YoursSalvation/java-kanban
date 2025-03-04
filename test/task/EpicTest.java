@@ -16,7 +16,7 @@ class EpicTest {
     static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy, HH:mm");
 
     @BeforeAll
-    static void create_sub_tasks() {
+    static void createSubTasks() {
         SubTask subTask1 = new SubTask(new Task("SubTask1", "description1", 2, Status.NEW
                 , Duration.ofMinutes(120), LocalDateTime.parse("12.12.2025, 12:00", formatter)), 1);
         SubTask subTask2 = new SubTask(new Task("SubTask2", "description2", 3, Status.NEW
@@ -28,7 +28,7 @@ class EpicTest {
     }
 
     @Test
-    void check_duration_correct_work() {
+    void checkDurationCorrectWork() {
         assertEquals(132, epic.duration.toMinutes());
     }
 }
